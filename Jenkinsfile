@@ -1,88 +1,29 @@
 pipeline {
     agent any
-
-    environment {
-        DOCKER_IMAGE_NAME = "flask-app"
-        DOCKER_COMPOSE_FILE = "docker-compose.yml"
-    }
-
     stages {
-        stage('Cleanup') {
+        stage('Info') {
             steps {
-                cleanWs() 
+                echo "Job: ${env.JOB_NAME} is building on branch ${env.GIT_BRANCH} and build-id is ${env.BUILD_ID}"
+                sh 'sleep 5'
             }
         }
-
-        stage('Clone Repository') {
+        stage('Build') {
             steps {
-                checkout scm
+                echo "this is build stage"
+                sh 'sleep 5'
             }
         }
-
-        stage('Copy Files to Remote Server') {
+        stage('Test') {
             steps {
-                sshagent(['development_server']) {
-                    sh '''
-                    scp -r * root@3.99.104.202:/opt/project/
-                    '''
-                }
+                echo "this is test stage"
+                sh 'sleep 5'
             }
         }
-
-        stage('Build Docker Image') {
+        stage('Deploy') {
             steps {
-                sshagent(['development_server']) {
-                    sh '''
-                    ssh root@3.99.104.202 "cd /opt/project/app && docker build -t ${DOCKER_IMAGE_NAME} ."
-                    '''
-                }
+                echo "this is deploy stage"
+                sh 'sleep 5'
             }
-        }
-
-        stage('Deploy to Development Server') {
-            steps {
-                sshagent(['development_server']) {
-                    sh '''
-                    ssh root@3.99.104.202 'docker pull ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest'
-                    ssh root@3.99.104.202 'cd /opt/project && docker-compose -f ${DOCKER_COMPOSE_FILE} up -d'
-                    '''
-                }
-            }
-        }
-
-        stage('Test Website') {
-            steps {
-                sshagent(['development_server']) {
-                    sh '''
-                    ssh root@3.99.104.202 "curl -I http://3.99.104.202:5000"
-                    '''
-                }
-            }
-        }
-
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                sshagent(['development_server']) {
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                        sh '''
-                        ssh root@3.99.104.202 "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
-                        ssh root@3.99.104.202 "docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
-                        ssh root@3.99.104.202 "docker push ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
-                        '''
-                    }
-                }
-            }
-        }
-
-    }
-
-    post {
-        success {
-            echo 'Pipeline finished successfully!'
-        }
-
-        failure {
-            echo 'Pipeline failed!'
         }
     }
 }
