@@ -5,7 +5,7 @@ pipeline {
         DEV_SERVER = "3.99.104.202"  // Update with your dev server IP
         DEV_SERVER_CREDENTIALS = "development_server"
         REPO_PATH = "/opt/project"
-        IMAGE_NAME = "custom-wordpress:latest"
+        IMAGE_NAME = "saravana227/custom-wordpress:latest"
         DOCKER_HUB_CREDENTIALS = 'dockerhub-auth' // Add this if it's not already set
     }
 
