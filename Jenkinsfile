@@ -56,7 +56,7 @@ pipeline {
                     docker stop \$(docker ps -q);
                     docker rm -f \$(docker ps -a -q);
                     fi &&
-                    docker-compose up -d
+                    docker-compose up -d --build
                     "
                     """
                 }
