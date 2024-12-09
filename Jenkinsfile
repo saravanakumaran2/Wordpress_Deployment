@@ -50,11 +50,13 @@ pipeline {
                 sshagent([DEV_SERVER_CREDENTIALS]) {
                     sh """
                     ssh root@${DEV_SERVER} "
-                        cd ${REPO_PATH} &&
-                        docker-compose down -v && 
-                        docker stop \$(docker ps -q) &&
-                        docker rm -f \$(docker ps -a -q) &&
-                        docker-compose up -d
+                    cd ${REPO_PATH} &&
+                    docker-compose down -v && 
+                    if [ \$(docker ps -q) ]; then
+                    docker stop \$(docker ps -q);
+                    docker rm -f \$(docker ps -a -q);
+                    fi &&
+                    docker-compose up -d
                     "
                     """
                 }
