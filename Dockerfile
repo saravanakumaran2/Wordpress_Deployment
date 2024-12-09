@@ -25,6 +25,9 @@ WORKDIR /var/www/html
 # Copy local WordPress files to the container
 COPY . /var/www/html
 
+# Copy custom wp-config.php to replace the default one
+COPY wp-config.php /var/www/html/wp-config.php
+
 # Set environment variables for MySQL credentials
 ENV WORDPRESS_DB_HOST=db:3306
 ENV WORDPRESS_DB_NAME=wordpress
