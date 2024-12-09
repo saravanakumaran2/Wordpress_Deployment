@@ -1,29 +1,55 @@
 pipeline {
     agent any
+    environment {
+        SONAR_PROJECT_KEY = 'website'
+        SONAR_HOST_URL = 'http://15.223.157.208:9000'
+        SONAR_CREDENTIALS_ID = 'sonar-token'
+    }
     stages {
-        stage('Info') {
+        stage('Checkout') {
             steps {
-                echo "Job: ${env.JOB_NAME} is building on branch ${env.GIT_BRANCH} and build-id is ${env.BUILD_ID}"
-                sh 'sleep 5'
+                checkout scm
+                script {
+                    if (env.GIT_BRANCH != 'origin/development') {
+                        error "Skipping code quality analysis for branch: ${env.GIT_BRANCH}"
+                    }
+                }
             }
         }
         stage('Build') {
             steps {
-                echo "this is build stage"
-                sh 'sleep 5'
+                echo "Building the project..."
             }
         }
         stage('Test') {
             steps {
-                echo "this is test stage"
-                sh 'sleep 5'
+                echo "Running tests..."
             }
         }
-        stage('Deploy') {
+        stage('SonarQube Analysis') {
             steps {
-                echo "this is deploy stage"
-                sh 'sleep 5'
+                echo "Running SonarQube analysis for branch: ${env.GIT_BRANCH}"
+                withCredentials([string(credentialsId: SONAR_CREDENTIALS_ID, variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                    sonar-scanner \
+                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                        -Dsonar.login=${SONAR_TOKEN}
+                    '''
+                }
             }
+        }
+    }
+    post {
+        always {
+            echo "Pipeline completed."
+        }
+        success {
+            echo "Pipeline executed successfully."
+        }
+        failure {
+            echo "Pipeline execution failed."
         }
     }
 }
