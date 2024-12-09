@@ -2,60 +2,70 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = 'dockerhub-auth'
-        SONARQUBE_SERVER = 'SonarQube'
-        SONARQUBE_TOKEN = credentials('sonar-token-id')
-        DEV_SERVER = "34.200.161.17"
+        DEV_SERVER = "3.99.104.202"  // Update with your dev server IP
         DEV_SERVER_CREDENTIALS = "development_server"
-        REPO_PATH = "/root/Wordpress_Deployment/"
-	}
+        REPO_PATH = "/opt/project"
+        IMAGE_NAME = "saravana227/custom-wordpress:latest"
+        DOCKER_HUB_CREDENTIALS = 'dockerhub-auth' // Add this if it's not already set
+    }
 
     stages {
-        stage('Code Checkout') {
+        stage('Cleanup Workspace') {
             steps {
-                // Pull the latest code from Git
-                checkout scm
+                cleanWs()  // Cleanup workspace
             }
         }
 
-        stage('Build Docker Image on Dev Server') {
+        stage('Code Checkout') {
             steps {
-                script {
-                    // Dynamically generate the Docker image name
-                    def imageName = "your-dockerhub-username/my-image:${env.BUILD_NUMBER}"
-                    env.IMAGE_NAME = imageName
+                checkout scm  // Checkout the source code from the repository
+            }
+        }
 
-                    // SSH into the dev server and build the Docker image
-                    sshagent([DEV_SERVER_CREDENTIALS]) {
-                        sh """
-                        ssh root@${DEV_SERVER} "cd ${REPO_PATH} && docker build -t ${env.IMAGE_NAME} ."
-                        """
-                    }
+        stage('Copy Files to Dev Server') {
+            steps {
+                sshagent([DEV_SERVER_CREDENTIALS]) {
+                    sh """
+                    scp -r * root@${DEV_SERVER}:${REPO_PATH}
+                    """
                 }
             }
         }
 
-        stage('Deploy Container on Dev Server') {
+        stage('Build Docker Image') {
             steps {
-                script {
-                    // Stop and remove existing container, then run the new one
-                    sshagent([DEV_SERVER_CREDENTIALS]) {
-                        sh """
-                        ssh root@${DEV_SERVER} "docker stop dev-container || true"
-                        ssh root@${DEV_SERVER} "docker rm dev-container || true"
-                        ssh root@${DEV_SERVER} "docker run --name dev-container -d -p 8082:80 ${env.IMAGE_NAME}"
-                        """
-                    }
+                sshagent([DEV_SERVER_CREDENTIALS]) {
+                    sh """
+                    ssh root@${DEV_SERVER} "
+                        cd ${REPO_PATH} &&
+                        docker build -t ${IMAGE_NAME} .
+                    "
+                    """
+                }
+            }
+        }
+
+        stage('Deploy Containers') {
+            steps {
+                sshagent([DEV_SERVER_CREDENTIALS]) {
+                    sh """
+                    ssh root@${DEV_SERVER} "
+                        cd ${REPO_PATH} &&
+                        docker-compose down &&
+                        docker-compose up -d
+                    "
+                    """
                 }
             }
         }
 
         stage('Test Deployment') {
             steps {
-                // Test if the deployment is accessible
-                sh '''
-                curl -I http://${DEV_SERVER}:8082 || exit 1
-                '''
+                sshagent([DEV_SERVER_CREDENTIALS]) {
+                    sh """
+                    curl -I http://${DEV_SERVER}:8080 || exit 1
+                    """
+                }
             }
         }
 
@@ -64,13 +74,15 @@ pipeline {
                 script {
                     // Push the image to Docker Hub
                     sshagent([DEV_SERVER_CREDENTIALS]) {
-                        sh """
-                        ssh root@${DEV_SERVER} "docker login -u your-dockerhub-username -p \$(cat /path/to/dockerhub-password-file)"
-                        ssh root@${DEV_SERVER} "docker push ${env.IMAGE_NAME}"
-                        """
+                        withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                            sh """
+                            ssh root@${DEV_SERVER} "docker login -u \$USERNAME -p \$PASSWORD"
+                            ssh root@${DEV_SERVER} "docker push ${IMAGE_NAME}"
+                            """
+                        }
                     }
                 }
             }
-        }
-    }
+        }
+    }
 }

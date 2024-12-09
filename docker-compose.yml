@@ -3,33 +3,38 @@ version: '3.8'
 services:
   wordpress:
     build:
-      context: .  # Builds the WordPress image from the Dockerfile in the current directory
-    image: custom-wordpress:latest  # Custom WordPress image
+      context: .  # Builds the image from the Dockerfile in the current directory
+    image: custom-wordpress:latest  # Name of the custom WordPress image
     container_name: wordpress
     ports:
-      - "8080:80"  # Maps port 8080 on the host to port 80 in the container
+      - "8080:80"  # Maps port 8080 on your host to port 80 on the container
     environment:
-      WORDPRESS_DB_HOST: db:3306  # Connect to MySQL container on port 3306
-      WORDPRESS_DB_NAME: wordpress  # Database name
-      WORDPRESS_DB_USER: wordpress  # Database user
-      WORDPRESS_DB_PASSWORD: wordpress  # Database user password
+      WORDPRESS_DB_HOST: db:3306  # MySQL service (the db container) as the host
+      WORDPRESS_DB_NAME: wordpress  # WordPress database name
+      WORDPRESS_DB_USER: wordpress  # WordPress database user
+      WORDPRESS_DB_PASSWORD: wordpress  # WordPress database user password
     volumes:
-      - wordpress_data:/var/www/html  # Persist WordPress files
+      - wordpress_data:/var/www/html  # Persist WordPress data (uploads, themes, plugins, etc.)
     depends_on:
-      - db  # Ensure MySQL starts before WordPress
+      - db  # Ensures that MySQL is started before WordPress
 
   db:
-    image: mysql:5.7  # Official MySQL 5.7 image
+    image: mysql:5.7  # Official MySQL image (MySQL 5.7)
     container_name: wordpress_db
-    restart: always  # Restart policy for the database
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword  # Root password for MySQL
+      MYSQL_ROOT_PASSWORD: wordpress  # Root password for MySQL
       MYSQL_DATABASE: wordpress  # Create a database named 'wordpress'
       MYSQL_USER: wordpress  # WordPress database user
       MYSQL_PASSWORD: wordpress  # Password for WordPress database user
     volumes:
       - db_data:/var/lib/mysql  # Persist MySQL data
+    networks:
+      - wordpress-network
 
 volumes:
-  wordpress_data:  # Named volume for WordPress files
+  wordpress_data:  # Named volume for WordPress data
   db_data:  # Named volume for MySQL data
+
+networks:
+  wordpress-network:
+    driver: bridge  # Use the default bridge network
