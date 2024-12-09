@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDENTIALS = 'dockerhub-auth'
-        SONARQUBE_SERVER = 'SonarQube'
-        SONARQUBE_TOKEN = credentials('sonar-token-id')
+        // SONARQUBE_SERVER = 'SonarQube'
+        // SONARQUBE_TOKEN = credentials('sonar-token-id')
         DEV_SERVER = "34.200.161.17"
         DEV_SERVER_CREDENTIALS = "development_server"
         REPO_PATH = "/root/Wordpress_Deployment/"
@@ -22,7 +22,7 @@ pipeline {
             steps {
                 script {
                     // Dynamically generate the Docker image name
-                    def imageName = "your-dockerhub-username/my-image:${env.BUILD_NUMBER}"
+                    def imageName = "saravana227/my-image:${env.BUILD_NUMBER}"
                     env.IMAGE_NAME = imageName
 
                     // SSH into the dev server and build the Docker image
