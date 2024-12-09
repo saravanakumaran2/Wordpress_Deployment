@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  mysql-server:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: users
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+    container_name: mysql-server
+
+  flask-app:
+    build: .
+    depends_on:
+      - mysql-server
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    container_name: flask-app
+
+volumes:
+  mysql-data:
+
+networks:
+  app-network:
+    driver: bridge

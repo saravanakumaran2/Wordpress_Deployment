@@ -1,55 +1,88 @@
 pipeline {
     agent any
+
     environment {
-        SONAR_PROJECT_KEY = 'website'
-        SONAR_HOST_URL = 'http://15.223.157.208:9000'
-        SONAR_CREDENTIALS_ID = 'sonar-token'
+        DOCKER_IMAGE_NAME = "flask-app"
+        DOCKER_COMPOSE_FILE = "docker-compose.yml"
     }
+
     stages {
-        stage('Checkout') {
+        stage('Cleanup') {
+            steps {
+                cleanWs() 
+            }
+        }
+
+        stage('Clone Repository') {
             steps {
                 checkout scm
-                script {
-                    if (env.GIT_BRANCH != 'origin/development') {
-                        error "Skipping code quality analysis for branch: ${env.GIT_BRANCH}"
-                    }
-                }
             }
         }
-        stage('Build') {
+
+        stage('Copy Files to Remote Server') {
             steps {
-                echo "Building the project..."
-            }
-        }
-        stage('Test') {
-            steps {
-                echo "Running tests..."
-            }
-        }
-        stage('SonarQube Analysis') {
-            steps {
-                echo "Running SonarQube analysis for branch: ${env.GIT_BRANCH}"
-                withCredentials([string(credentialsId: SONAR_CREDENTIALS_ID, variable: 'SONAR_TOKEN')]) {
+                sshagent(['development_server']) {
                     sh '''
-                    sonar-scanner \
-                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=${SONAR_HOST_URL} \
-                        -Dsonar.login=${SONAR_TOKEN}
+                    scp -r * root@3.99.104.202:/opt/project/
                     '''
                 }
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                sshagent(['development_server']) {
+                    sh '''
+                    ssh root@3.99.104.202 "cd /opt/project/app && docker build -t ${DOCKER_IMAGE_NAME} ."
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Development Server') {
+            steps {
+                sshagent(['development_server']) {
+                    sh '''
+                    ssh root@3.99.104.202 'docker pull ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest'
+                    ssh root@3.99.104.202 'cd /opt/project && docker-compose -f ${DOCKER_COMPOSE_FILE} up -d'
+                    '''
+                }
+            }
+        }
+
+        stage('Test Website') {
+            steps {
+                sshagent(['development_server']) {
+                    sh '''
+                    ssh root@3.99.104.202 "curl -I http://3.99.104.202:5000"
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                sshagent(['development_server']) {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-auth', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh '''
+                        ssh root@3.99.104.202 "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
+                        ssh root@3.99.104.202 "docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
+                        ssh root@3.99.104.202 "docker push ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
+                        '''
+                    }
+                }
+            }
+        }
+
     }
+
     post {
-        always {
-            echo "Pipeline completed."
-        }
         success {
-            echo "Pipeline executed successfully."
+            echo 'Pipeline finished successfully!'
         }
+
         failure {
-            echo "Pipeline execution failed."
+            echo 'Pipeline failed!'
         }
     }
 }
