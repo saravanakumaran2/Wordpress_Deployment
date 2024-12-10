@@ -1,6 +1,6 @@
 # Use Apache as the base image
 FROM php:8.0-apache
-
+# Use Apache as the base image
 # Install PHP extensions required for WordPress
 RUN apt-get update && apt-get install -y \
    libpng-dev \
