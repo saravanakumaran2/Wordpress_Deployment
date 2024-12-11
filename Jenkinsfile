@@ -59,6 +59,7 @@ pipeline {
                     docker stop \$(docker ps -q);
                     docker rm -f \$(docker ps -a -q);
                     fi &&
+                    ssh root@${DEV_SERVER} "docker push ${IMAGE_NAME_STAGING}"
                     docker-compose up -d --build
                     "
                     """
@@ -85,7 +86,6 @@ pipeline {
                             sh """
                             ssh root@${DEV_SERVER} "docker login -u \$USERNAME -p \$PASSWORD"
                             ssh root@${DEV_SERVER} "docker push ${IMAGE_NAME}"
-                            ssh root@${DEV_SERVER} "docker push ${IMAGE_NAME_STAGING}"
                             """
                         }
                     }
