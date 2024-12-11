@@ -2,11 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DEV_SERVER = "3.99.104.202"  // Update with your dev server IP
-        DEV_SERVER_CREDENTIALS = "development_server"
-        REPO_PATH = "/opt/project"
+        STAGING_SERVER = "52.60.108.120"  // Staging server IP address
+        STAGING_SERVER_CREDENTIALS = "staging_server"  // Staging server credentials
         IMAGE_NAME = "saravana227/custom-wordpress:latest"
-        DOCKER_HUB_CREDENTIALS = 'dockerhub-auth' // Add this if it's not already set
     }
 
     stages {
@@ -16,29 +14,12 @@ pipeline {
             }
         }
 
-        stage('Code Checkout') {
+        stage('Pull Docker Image from Docker Hub') {
             steps {
-                checkout scm  // Checkout the source code from the repository
-            }
-        }
-
-        stage('Copy Files to Dev Server') {
-            steps {
-                sshagent([DEV_SERVER_CREDENTIALS]) {
+                sshagent([STAGING_SERVER_CREDENTIALS]) {
                     sh """
-                    scp -r * root@${DEV_SERVER}:${REPO_PATH}
-                    """
-                }
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sshagent([DEV_SERVER_CREDENTIALS]) {
-                    sh """
-                    ssh root@${DEV_SERVER} "
-                        cd ${REPO_PATH} &&
-                        docker build -t ${IMAGE_NAME} .
+                    ssh root@${STAGING_SERVER} "
+                        docker pull ${IMAGE_NAME}
                     "
                     """
                 }
@@ -47,10 +28,15 @@ pipeline {
 
         stage('Deploy Containers') {
             steps {
-                sshagent([DEV_SERVER_CREDENTIALS]) {
+                sshagent([STAGING_SERVER_CREDENTIALS]) {
                     sh """
-                    ssh root@${DEV_SERVER} "
-
+                    ssh root@${STAGING_SERVER} "
+                    docker-compose down -v && 
+                    if [ \$(docker ps -q) ]; then
+                    docker stop \$(docker ps -q);
+                    docker rm -f \$(docker ps -a -q);
+                    fi &&
+                    docker-compose up -d
                     "
                     """
                 }
@@ -59,26 +45,10 @@ pipeline {
 
         stage('Test Deployment') {
             steps {
-                sshagent([DEV_SERVER_CREDENTIALS]) {
+                sshagent([STAGING_SERVER_CREDENTIALS]) {
                     sh """
-
+                    curl -I http://${STAGING_SERVER}:80 || exit 1
                     """
-                }
-            }
-        }
-
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                script {
-                    // Push the image to Docker Hub
-                    sshagent([DEV_SERVER_CREDENTIALS]) {
-                        withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                            sh """
-                            ssh root@${DEV_SERVER} "docker login -u \$USERNAME -p \$PASSWORD"
-                            ssh root@${DEV_SERVER} "docker push ${IMAGE_NAME}"
-                            """
-                        }
-                    }
                 }
             }
         }
