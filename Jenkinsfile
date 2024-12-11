@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sshagent([STAGING_SERVER_CREDENTIALS]) {
                     sh """
-                    scp -r * root@${STAGING_SERVER}:${REPO_PATH}
+                    scp -r ./* root@${STAGING_SERVER}:${REPO_PATH}
                     """
                 }
             }
