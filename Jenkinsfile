@@ -54,6 +54,7 @@ pipeline {
                 sshagent([STAGING_SERVER_CREDENTIALS]) {
                     sh """
                     ssh root@${STAGING_SERVER} "
+                     cd ${REPO_PATH} &&
                     docker-compose down -v && 
                     if [ \$(docker ps -q) ]; then
                     docker stop \$(docker ps -q);
