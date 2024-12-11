@@ -2,7 +2,7 @@ version: '3'
 
 services:
   wordpress:
-    image: saravana227/custom-wordpress:latest
+    image: saravana227/custom-wordpress:staging
     ports:
       - "80:80"
     volumes:
