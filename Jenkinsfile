@@ -5,7 +5,7 @@ pipeline {
         STAGING_SERVER = "52.60.108.120"  // Staging server IP address
         STAGING_SERVER_CREDENTIALS = "staging_server"  // Staging server credentials
         IMAGE_NAME = "saravana227/custom-wordpress:latest"
-        DOCKER_HUB_CREDENTIALS = "dockerhub_auth"  // Docker Hub credentials
+        DOCKER_HUB_CREDENTIALS = "dockerhub-auth"  // Docker Hub credentials
     }
 
     stages {
