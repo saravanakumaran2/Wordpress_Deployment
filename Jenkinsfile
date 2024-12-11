@@ -28,7 +28,7 @@ pipeline {
             steps {
                 sshagent([STAGING_SERVER_CREDENTIALS]) {
                     sh """
-                    mkdir -p /opt/project
+                    sudo mkdir -p /opt/project
                     scp -r docker-compose.yml root@${STAGING_SERVER}:${REPO_PATH}
                     """
                 }
