@@ -6,7 +6,7 @@ pipeline {
         STAGING_SERVER_CREDENTIALS = "staging_server"  // Staging server credentials
         IMAGE_NAME = "saravana227/custom-wordpress:latest"
         DOCKER_HUB_CREDENTIALS = "dockerhub-auth"  // Docker Hub credentials
-        REPO_PATH = "/opt/project"
+        REPO_PATH = "/opt/project/"
     }
 
     stages {
@@ -28,7 +28,6 @@ pipeline {
             steps {
                 sshagent([STAGING_SERVER_CREDENTIALS]) {
                     sh """
-                    sudo mkdir -p /opt/project
                     scp -r docker-compose.yml root@${STAGING_SERVER}:${REPO_PATH}
                     """
                 }
