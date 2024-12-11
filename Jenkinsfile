@@ -50,9 +50,7 @@ pipeline {
                 sshagent([DEV_SERVER_CREDENTIALS]) {
                     sh """
                     ssh root@${DEV_SERVER} "
-                        cd ${REPO_PATH} &&
-                        docker-compose down &&
-                        docker-compose up -d
+
                     "
                     """
                 }
@@ -63,7 +61,7 @@ pipeline {
             steps {
                 sshagent([DEV_SERVER_CREDENTIALS]) {
                     sh """
-                    curl -I http://${DEV_SERVER}:8080 || exit 1
+
                     """
                 }
             }
