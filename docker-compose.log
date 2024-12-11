@@ -1,5 +1,0 @@
-nohup: ignoring input
-Creating network "wordpress_deployment_wordpress-network" with driver "bridge"
-Creating volume "wordpress_deployment_wordpress_data" with default driver
-Creating wordpress ... 
-Creating wordpress ... done
