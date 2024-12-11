@@ -5,6 +5,7 @@ pipeline {
         STAGING_SERVER = "52.60.108.120"  // Staging server IP address
         STAGING_SERVER_CREDENTIALS = "staging_server"  // Staging server credentials
         IMAGE_NAME = "saravana227/custom-wordpress:latest"
+        DOCKER_HUB_CREDENTIALS = "dockerhub_auth"  // Docker Hub credentials
     }
 
     stages {
@@ -17,11 +18,14 @@ pipeline {
         stage('Pull Docker Image from Docker Hub') {
             steps {
                 sshagent([STAGING_SERVER_CREDENTIALS]) {
-                    sh """
-                    ssh root@${STAGING_SERVER} "
-                        docker pull ${IMAGE_NAME}
-                    "
-                    """
+                    withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh """
+                        ssh root@${STAGING_SERVER} "
+                            echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin &&
+                            docker pull ${IMAGE_NAME}
+                        "
+                        """
+                    }
                 }
             }
         }
