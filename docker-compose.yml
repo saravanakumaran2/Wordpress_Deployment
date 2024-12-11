@@ -6,8 +6,8 @@ services:
     ports:
       - "80:80"
     volumes:
-       # - ./wp-config.php:/var/www/html/wp-config.php
-      - .:/var/www/html  # Assuming your WordPress files are in the 'html' directory
+      - ./wp-config.php:/var/www/html/wp-config.php
+      - ./html:/var/www/html  # Assuming your WordPress files are in the 'html' directory
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_NAME: wordpress
