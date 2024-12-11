@@ -39,6 +39,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh """
                         ssh root@${STAGING_SERVER} "
+                            cd ${REPO_PATH} &&
                             echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin &&
                             docker pull ${IMAGE_NAME}
                         "
@@ -53,7 +54,6 @@ pipeline {
                 sshagent([STAGING_SERVER_CREDENTIALS]) {
                     sh """
                     ssh root@${STAGING_SERVER} "
-                    cd ${REPO_PATH} &&
                     docker-compose down -v && 
                     if [ \$(docker ps -q) ]; then
                     docker stop \$(docker ps -q);
