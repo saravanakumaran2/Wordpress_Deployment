@@ -6,6 +6,7 @@ pipeline {
         STAGING_SERVER_CREDENTIALS = "staging_server"  // Staging server credentials
         IMAGE_NAME = "saravana227/custom-wordpress:latest"
         DOCKER_HUB_CREDENTIALS = "dockerhub-auth"  // Docker Hub credentials
+        REPO_PATH = "/opt/project"
     }
 
     stages {
@@ -44,6 +45,7 @@ pipeline {
                 sshagent([STAGING_SERVER_CREDENTIALS]) {
                     sh """
                     ssh root@${STAGING_SERVER} "
+                    cd ${REPO_PATH} &&
                     docker-compose down -v && 
                     if [ \$(docker ps -q) ]; then
                     docker stop \$(docker ps -q);
