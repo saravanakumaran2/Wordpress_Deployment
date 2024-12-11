@@ -14,7 +14,16 @@ pipeline {
                 cleanWs()  // Cleanup workspace
             }
         }
-
+        
+        stage('Copy Files to Dev Server') {
+            steps {
+                sshagent([STAGING_SERVER_CREDENTIALS]) {
+                    sh """
+                    scp -r docker-compose.yml root@${STAGING_SERVER}:${REPO_PATH}
+                    """
+                }
+            }
+        }
         stage('Pull Docker Image from Docker Hub') {
             steps {
                 sshagent([STAGING_SERVER_CREDENTIALS]) {
