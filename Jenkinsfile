@@ -4,7 +4,7 @@ pipeline {
     environment {
         production_server = "52.60.169.243"  // Staging server IP address
         production_server_CREDENTIALS = "production_server"  // Staging server credentials
-        IMAGE_NAME = "saravana227/custom-wordpress:latest"
+        IMAGE_NAME = "saravana227/custom-wordpress:staging"
         DOCKER_HUB_CREDENTIALS = "dockerhub-auth"  // Docker Hub credentials
         REPO_PATH = "/opt/project/"
     }
