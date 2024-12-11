@@ -6,6 +6,7 @@ pipeline {
         DEV_SERVER_CREDENTIALS = "development_server"
         REPO_PATH = "/opt/project"
         IMAGE_NAME = "saravana227/custom-wordpress:latest"
+        IMAGE_NAME_STAGING = "saravana227/custom-wordpress:staging"
         DOCKER_HUB_CREDENTIALS = 'dockerhub-auth' // Add this if it's not already set
     }
 
@@ -39,6 +40,8 @@ pipeline {
                     ssh root@${DEV_SERVER} "
                         cd ${REPO_PATH} &&
                         docker build -t ${IMAGE_NAME} .
+                        # Build the 'staging' tag
+                        docker build -t ${IMAGE_NAME_STAGING} .
                     "
                     """
                 }
@@ -82,6 +85,7 @@ pipeline {
                             sh """
                             ssh root@${DEV_SERVER} "docker login -u \$USERNAME -p \$PASSWORD"
                             ssh root@${DEV_SERVER} "docker push ${IMAGE_NAME}"
+                            ssh root@${DEV_SERVER} "docker push ${IMAGE_NAME_STAGING}"
                             """
                         }
                     }
