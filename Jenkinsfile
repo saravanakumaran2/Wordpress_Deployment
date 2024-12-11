@@ -55,6 +55,7 @@ pipeline {
                     sh """
                     ssh root@${production_server} "
                      cd ${REPO_PATH} &&
+                     chmod 777 * && 
                     docker-compose down -v && 
                     if [ \$(docker ps -q) ]; then
                     docker stop \$(docker ps -q);
