@@ -11,7 +11,8 @@ from datetime import datetime
 
 class TestWordPressSetupAndLogin(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         # Set up Chrome options for headless mode
         chrome_options = Options()
         chrome_options.add_argument("--headless")
@@ -21,9 +22,9 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
 
         # Set up the ChromeDriver service using webdriver-manager
         service = Service(ChromeDriverManager().install())
-        self.driver = webdriver.Chrome(service=service, options=chrome_options)
-        self.driver.get("http://52.60.108.120/wp-admin/install.php")
-        self.driver.maximize_window()
+        cls.driver = webdriver.Chrome(service=service, options=chrome_options)
+        cls.driver.get("http://52.60.108.120/wp-admin/install.php")
+        cls.driver.maximize_window()
 
     def test_language_selection_and_site_setup_and_login(self):
         driver = self.driver
@@ -73,8 +74,8 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.ID, "user_login"))
         )
-        driver.find_element(By.ID, "user_login").send_keys("Jini")  # Replace with your username
-        driver.find_element(By.ID, "user_pass").send_keys("YourChosenPassword")  # Replace with your password
+        driver.find_element(By.ID, "user_login").send_keys("admin_user")  # Use your username here
+        driver.find_element(By.ID, "user_pass").send_keys("StrongPassword123!")  # Use your password here
         driver.find_element(By.ID, "wp-submit").click()
         print("Login process completed.")
 
@@ -85,9 +86,9 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         print("Dashboard loaded successfully. Test passed.")
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         print("Closing the browser...")
-        self.driver.quit()
+        cls.driver.quit()
 
 
 if __name__ == "__main__":
