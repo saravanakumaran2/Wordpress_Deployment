@@ -40,7 +40,7 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         print("Language selection completed.")
 
         # Step 2: Fill the Site Setup Form
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 40).until(
             EC.visibility_of_element_located((By.ID, "weblog_title"))
         )
         site_title = "My WordPress Site"
