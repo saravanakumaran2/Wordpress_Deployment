@@ -30,7 +30,7 @@ pipeline {
         script {
             // This triggers the SonarQube analysis with hard-coded authentication details
             sh '''
-            export PATH=$PATH:/opt/sonar-scanner/bin/sonar-scanner
+            export PATH=$PATH:/opt/sonar-scanner/bin
             sonar-scanner \
             sonar-scanner -Dsonar.projectKey=Project \
                 -Dsonar.projectName="Project" \
