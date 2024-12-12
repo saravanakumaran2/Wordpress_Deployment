@@ -11,10 +11,11 @@ from datetime import datetime
 class TestWordPressLogin(unittest.TestCase):
 
     def setUp(self):
-        # Set up the ChromeDriver service using webdriver-manager
-        service = Service(ChromeDriverManager().install())
+        # Get the path of the installed ChromeDriver
+        driver_path = ChromeDriverManager().install()
+        service = Service(driver_path)
         self.driver = webdriver.Chrome(service=service)
-        self.driver.get("http://52.60.108.120:80/wp-login.php")
+        self.driver.get("http://localhost:8080/wp-login.php")
         self.driver.maximize_window()
 
     def test_login(self):
