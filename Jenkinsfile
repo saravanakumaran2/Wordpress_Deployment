@@ -24,7 +24,7 @@ pipeline {
         }
 
         
-        stage('Copy Files to Dev Server') {
+        stage('Copy Files to Staging Server') {
             steps {
                 sshagent([STAGING_SERVER_CREDENTIALS]) {
                     sh """
