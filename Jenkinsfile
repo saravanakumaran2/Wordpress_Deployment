@@ -30,15 +30,17 @@ pipeline {
         script {
             // This triggers the SonarQube analysis with hard-coded authentication details
             sh '''
-            export PATH=$PATH:/opt/sonar-scanner/bin
-            sonar-scanner \
-            sonar-scanner -Dsonar.projectKey=Project \
-                -Dsonar.projectName="Project" \
-                -Dsonar.projectVersion=1.0.0 \
-                -Dsonar.sources=. \
-                -Dsonar.php.version=7.4 \
-                -Dsonar.host.url=http://15.223.157.208:9000 \
-                -Dsonar.login=sqa_702bcb1dc6881be73b88450c5e501cf3b31b9d1e
+            sonar-scanner -X -Dsonar.projectKey=Project -Dsonar.projectName="Project" -Dsonar.projectVersion=1.0.0 -Dsonar.sources=. -Dsonar.php.version=7.4 -Dsonar.host.url=http://15.223.157.208:9000 -Dsonar.login=admin -Dsonar.password=123
+
+            // export PATH=$PATH:/opt/sonar-scanner/bin
+            // sonar-scanner \
+            // sonar-scanner -Dsonar.projectKey=Project \
+             //   -Dsonar.projectName="Project" \
+             //   -Dsonar.projectVersion=1.0.0 \
+             //   -Dsonar.sources=. \
+              //  -Dsonar.php.version=7.4 \
+              //  -Dsonar.host.url=http://15.223.157.208:9000 \
+             //   -Dsonar.login=sqa_702bcb1dc6881be73b88450c5e501cf3b31b9d1e
             '''
         }
     }
