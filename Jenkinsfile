@@ -30,6 +30,7 @@ pipeline {
         script {
             // This triggers the SonarQube analysis with hard-coded authentication details
             sh '''
+            $SONAR_SCANNER_PATH \
             sonar-scanner -Dsonar.projectKey=Project \
                 -Dsonar.projectName="Project" \
                 -Dsonar.projectVersion=1.0.0 \
