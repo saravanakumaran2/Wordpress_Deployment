@@ -30,15 +30,14 @@ pipeline {
         script {
             // This triggers the SonarQube analysis with hard-coded authentication details
             sh '''
-            sonar-scanner \
-                -Dsonar.projectKey=Project \
+            sonar-scanner -Dsonar.projectKey=Project \
                 -Dsonar.projectName="Project" \
                 -Dsonar.projectVersion=1.0.0 \
                 -Dsonar.sources=. \
                 -Dsonar.php.version=7.4 \
                 -Dsonar.host.url=http://15.223.157.208:9000 \
-                -Dsonar.login=admin \  # Hard-coded username
-                -Dsonar.password=123  # Hard-coded password
+                -Dsonar.login=admin \
+                -Dsonar.password=123
             '''
         }
     }
