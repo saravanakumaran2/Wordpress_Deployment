@@ -6,20 +6,21 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+import os
+from datetime import datetime
 
-
-class TestWordPressSetupAndLogin(unittest.TestCase):
+class TestWordPressSetup(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Set up Chrome options for headless mode
+        # Configure Chrome for headless mode
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-gpu")
-
-        # Set up the ChromeDriver service using webdriver-manager
+        
+        # Set up ChromeDriver using webdriver-manager
         service = Service(ChromeDriverManager().install())
         cls.driver = webdriver.Chrome(service=service, options=chrome_options)
         cls.driver.get("http://52.60.108.120/wp-admin/install.php")
@@ -30,7 +31,7 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         print("Testing language selection, site setup, and login process...")
 
         # Step 1: Select Language and Click Continue
-        WebDriverWait(driver, 60).until(
+        WebDriverWait(driver, 20).until(
             EC.visibility_of_element_located((By.ID, "language"))
         )
         language_dropdown = driver.find_element(By.ID, "language")
@@ -39,7 +40,7 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         print("Language selection completed.")
 
         # Step 2: Fill the Site Setup Form
-        WebDriverWait(driver, 40).until(
+        WebDriverWait(driver, 20).until(
             EC.visibility_of_element_located((By.ID, "weblog_title"))
         )
         site_title = "My WordPress Site"
@@ -73,8 +74,8 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.ID, "user_login"))
         )
-        driver.find_element(By.ID, "user_login").send_keys("admin_user")  # Use your username here
-        driver.find_element(By.ID, "user_pass").send_keys("StrongPassword123!")  # Use your password here
+        driver.find_element(By.ID, "user_login").send_keys("admin_user")  # Use the username you set up
+        driver.find_element(By.ID, "user_pass").send_keys("StrongPassword123!")  # Use the password you set up
         driver.find_element(By.ID, "wp-submit").click()
         print("Login process completed.")
 
@@ -88,7 +89,6 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
     def tearDownClass(cls):
         print("Closing the browser...")
         cls.driver.quit()
-
 
 if __name__ == "__main__":
     unittest.main()
