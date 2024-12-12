@@ -27,7 +27,7 @@ pipeline {
             steps {
                 script {
                     // This triggers the SonarQube analysis
-                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                    withSonarQubeEnv(sonarqube) {
                         sh '''
                         # Run the SonarQube Scanner for PHP/WordPress project
                         sonar-scanner \
