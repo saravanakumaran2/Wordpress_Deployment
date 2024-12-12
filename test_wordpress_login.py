@@ -85,7 +85,7 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         print("Dashboard loaded successfully. Test passed.")
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(self):
         print("Closing the browser...")
         self.driver.quit()
 
