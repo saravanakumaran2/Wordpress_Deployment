@@ -6,6 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+import os
+from datetime import datetime
 import time
 
 class TestWordPressSetup(unittest.TestCase):
@@ -46,9 +48,11 @@ class TestWordPressSetup(unittest.TestCase):
         # Step 2: Select Language and Click Continue
         try:
             language_dropdown = driver.find_element(By.ID, "language")
-            language_option = language_dropdown.find_element(By.XPATH, "//option[@value='en_US' and @data-installed='1']")
-            print(f"Found language option: {language_option.text}")
-            language_option.click()
+            options = language_dropdown.find_elements(By.TAG_NAME, "option")
+            for option in options:
+                if option.get_attribute("value") == "en_US":
+                    option.click()
+                    break
             driver.find_element(By.ID, "language-continue").click()
             print("Language selection completed.")
         except Exception as e:
@@ -112,10 +116,25 @@ class TestWordPressSetup(unittest.TestCase):
                 EC.presence_of_element_located((By.ID, "wp-admin-bar-my-account"))
             )
             print("Dashboard loaded successfully. Test passed.")
+            
+            result = "Test case passed: Setup and login successful."
         except Exception as e:
             print(f"Login failed: {e}")
             print(driver.page_source)  # Print the page source for debugging
-            self.fail("Login page not found or login failed!")
+            result = "Test case failed: Login failed - Unable to find dashboard link."
+            self.fail(result)
+        
+        # Step 6: Write the result to a file
+        self.write_result_to_file(result)
+
+    def write_result_to_file(self, result):
+        report_dir = "/opt/test_result"
+        os.makedirs(report_dir, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_file = os.path.join(report_dir, f"setup_and_login_test_report_{timestamp}.txt")
+        with open(report_file, "w") as f:
+            f.write(result)
+        print(f"Report saved at: {report_file}")
 
     @classmethod
     def tearDownClass(cls):
