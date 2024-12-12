@@ -23,6 +23,26 @@ pipeline {
             }
         }
 
+        stage('sonarqube') {
+            steps {
+                script {
+                    // This triggers the SonarQube analysis
+                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                        sh '''
+                        # Run the SonarQube Scanner for PHP/WordPress project
+                        sonar-scanner \
+                            -Dsonar.projectKey=Project \
+                            -Dsonar.projectName="Custom WordPress Project" \
+                            -Dsonar.projectVersion=1.0.0 \
+                            -Dsonar.sources=. \
+                            -Dsonar.php.version=7.4 \
+                            -Dsonar.host.url=http://15.223.157.208:9000
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Copy Files to Dev Server') {
             steps {
                 sshagent([DEV_SERVER_CREDENTIALS]) {
