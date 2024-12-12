@@ -35,7 +35,7 @@ class TestWordPressSetup(unittest.TestCase):
             EC.visibility_of_element_located((By.ID, "language"))
         )
         language_dropdown = driver.find_element(By.ID, "language")
-        language_dropdown.find_element(By.XPATH, "//option[text()='English (United States)']").click()
+        language_dropdown.find_element(By.XPATH, "//option[@value='en_US' and @data-installed='1']").click()
         driver.find_element(By.ID, "language-continue").click()
         print("Language selection completed.")
 
