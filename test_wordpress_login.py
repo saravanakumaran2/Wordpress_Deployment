@@ -26,11 +26,7 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         cls.driver.get("http://52.60.108.120/wp-admin/install.php")
         cls.driver.maximize_window()
 
-    def test_language_selection_and_site_setup_and_login(self):
-        driver = self.driver
-        print("Testing language selection, site setup, and login process...")
-
-        def test_language_selection_and_site_setup_and_login(self):
+   def test_language_selection_and_site_setup_and_login(self):
     driver = self.driver
     print("Testing language selection, site setup, and login process...")
 
