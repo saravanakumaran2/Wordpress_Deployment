@@ -30,14 +30,18 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         driver = self.driver
         print("Testing language selection, site setup, and login process...")
 
-        # Step 1: Select Language and Click Continue
-        WebDriverWait(driver, 60).until(
-            EC.visibility_of_element_located((By.ID, "language"))
-        )
-        language_dropdown = driver.find_element(By.ID, "language")
-        language_dropdown.find_element(By.XPATH, "//option[text()='English (United States)']").click()
-        driver.find_element(By.ID, "language-continue").click()
-        print("Language selection completed.")
+        def test_language_selection_and_site_setup_and_login(self):
+    driver = self.driver
+    print("Testing language selection, site setup, and login process...")
+
+    # Step 1: Select Language and Click Continue
+    WebDriverWait(driver, 60).until(
+        EC.visibility_of_element_located((By.ID, "language"))
+    )
+    language_dropdown = driver.find_element(By.ID, "language")
+    language_dropdown.find_element(By.XPATH, "//option[text()='English (United States)']").click()
+    driver.find_element(By.ID, "language-continue").click()
+    print("Language selection completed.")
 
         # Step 2: Fill the Site Setup Form
         WebDriverWait(driver, 40).until(
