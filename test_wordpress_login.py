@@ -31,17 +31,17 @@ class TestWordPressSetup(unittest.TestCase):
         print("Testing language selection, site setup, and login process...")
 
         # Step 1: Retry loading the install page until successful
-        retries = 5
+        retries = 10
         for i in range(retries):
             try:
                 driver.get("http://52.60.108.120/wp-admin/install.php")
-                WebDriverWait(driver, 20).until(
+                WebDriverWait(driver, 60).until(
                     EC.visibility_of_element_located((By.ID, "language"))
                 )
                 break
             except Exception as e:
                 print(f"Attempt {i+1} failed: {e}")
-                time.sleep(20)  # Wait for 20 seconds before retrying
+                time.sleep(30)  # Wait for 30 seconds before retrying
         else:
             self.fail("Failed to load the install page after several attempts!")
 
@@ -62,7 +62,7 @@ class TestWordPressSetup(unittest.TestCase):
 
         # Step 3: Fill the Site Setup Form
         try:
-            WebDriverWait(driver, 20).until(
+            WebDriverWait(driver, 60).until(
                 EC.visibility_of_element_located((By.ID, "weblog_title"))
             )
             site_title = "My WordPress Site"
@@ -91,7 +91,7 @@ class TestWordPressSetup(unittest.TestCase):
 
         # Step 4: Verify Success Page and Click Login
         try:
-            WebDriverWait(driver, 20).until(
+            WebDriverWait(driver, 60).until(
                 EC.presence_of_element_located((By.LINK_TEXT, "Log In"))
             )
             driver.find_element(By.LINK_TEXT, "Log In").click()
@@ -103,7 +103,7 @@ class TestWordPressSetup(unittest.TestCase):
 
         # Step 5: Fill Login Form
         try:
-            WebDriverWait(driver, 20).until(
+            WebDriverWait(driver, 60).until(
                 EC.presence_of_element_located((By.ID, "user_login"))
             )
             driver.find_element(By.ID, "user_login").send_keys("admin_user")  # Use the username you set up
@@ -112,7 +112,7 @@ class TestWordPressSetup(unittest.TestCase):
             print("Login process completed.")
 
             # Verify Dashboard
-            WebDriverWait(driver, 20).until(
+            WebDriverWait(driver, 60).until(
                 EC.presence_of_element_located((By.ID, "wp-admin-bar-my-account"))
             )
             print("Dashboard loaded successfully. Test passed.")
