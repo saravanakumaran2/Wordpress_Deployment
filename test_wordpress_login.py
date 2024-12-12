@@ -22,73 +22,73 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         # Set up the ChromeDriver service using webdriver-manager
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
-        self.driver.get("http://52.60.108.120/wp-admin/setup-config.php")
+        self.driver.get("http://52.60.108.120/wp-admin/install.php")
         self.driver.maximize_window()
 
-    def test_setup_and_login(self):
+    def test_language_selection_and_site_setup_and_login(self):
         driver = self.driver
+        print("Testing language selection, site setup, and login process...")
 
-        # Step 1: Language selection
-        try:
-            print("Waiting for language selection page to appear...")
-            WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located((By.ID, "language"))
-            )
-            language = driver.find_element(By.ID, "language")
-            language.find_element(By.CSS_SELECTOR, "option[value='en_US']").click()
-            driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
-            print("Language selected.")
-        except Exception as e:
-            print("Language selection failed.")
-            self.fail("Language selection page not found!")
+        # Step 1: Select Language and Click Continue
+        WebDriverWait(driver, 20).until(
+            EC.visibility_of_element_located((By.ID, "language"))
+        )
+        language_dropdown = driver.find_element(By.ID, "language")
+        language_dropdown.find_element(By.XPATH, "//option[text()='English (United States)']").click()
+        driver.find_element(By.ID, "language-continue").click()
+        print("Language selection completed.")
 
-        # Step 2: Site information and user creation
-        try:
-            print("Waiting for site setup page to appear...")
-            WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located((By.ID, "weblog_title"))
-            )
-            driver.find_element(By.ID, "weblog_title").send_keys("wordPressTest")
-            driver.find_element(By.ID, "user_login").send_keys("Jinitusinu")
-            driver.find_element(By.ID, "pass1").send_keys("password@11")
-            driver.find_element(By.ID, "admin_email").send_keys("georgejinitus@gmail.com")
-            driver.find_element(By.ID, "submit").click()
-            print("Site information and user created.")
-        except Exception as e:
-            print("Site setup failed.")
-            self.fail("Site setup page not found!")
+        # Step 2: Fill the Site Setup Form
+        WebDriverWait(driver, 20).until(
+            EC.visibility_of_element_located((By.ID, "weblog_title"))
+        )
+        site_title = "My WordPress Site"
+        username = "admin_user"
+        password = "StrongPassword123!"
+        email = "admin@example.com"
 
-        # Step 3: Log in to the new WordPress site
-        try:
-            print("Waiting for login page to appear...")
-            WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located((By.ID, "user_login"))
-            )
-            driver.find_element(By.ID, "user_login").send_keys("Jinitusinu")
-            driver.find_element(By.ID, "user_pass").send_keys("password@11")
-            driver.find_element(By.ID, "wp-submit").click()
-            print("Logged in successfully.")
-            WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located((By.ID, "wp-admin-bar-my-account"))
-            )
-            print("Successfully reached the dashboard.")
-        except Exception as e:
-            print("Login failed.")
-            self.fail("Login page not found or login failed!")
+        driver.find_element(By.ID, "weblog_title").send_keys(site_title)
+        driver.find_element(By.ID, "user_login").send_keys(username)
+        driver.find_element(By.ID, "pass1").clear()
+        driver.find_element(By.ID, "pass1").send_keys(password)
+        driver.find_element(By.ID, "admin_email").send_keys(email)
 
-        # Write the result to the report file
-        report_dir = "/home/ubuntu/test_reports"
-        os.makedirs(report_dir, exist_ok=True)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        report_file = os.path.join(report_dir, f"setup_and_login_test_report_{timestamp}.txt")
-        with open(report_file, "w") as f:
-            f.write("Test case passed: Setup and login successful.")
-        print(f"Report saved at: {report_file}")
+        # (Optional) Uncheck 'Search Engine Visibility'
+        search_engine_visibility = driver.find_element(By.ID, "blog_public")
+        if search_engine_visibility.is_selected():
+            search_engine_visibility.click()
 
-    def tearDown(self):
-        # Close the browser after the test
+        # Submit the form
+        driver.find_element(By.ID, "submit").click()
+        print("Site setup completed.")
+
+        # Step 3: Verify Success Page and Click Login
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.LINK_TEXT, "Log In"))
+        )
+        driver.find_element(By.LINK_TEXT, "Log In").click()
+        print("Clicked on the 'Log In' link.")
+
+        # Step 4: Fill Login Form
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.ID, "user_login"))
+        )
+        driver.find_element(By.ID, "user_login").send_keys("Jini")  # Replace with your username
+        driver.find_element(By.ID, "user_pass").send_keys("YourChosenPassword")  # Replace with your password
+        driver.find_element(By.ID, "wp-submit").click()
+        print("Login process completed.")
+
+        # Verify Dashboard
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.ID, "wp-admin-bar-my-account"))
+        )
+        print("Dashboard loaded successfully. Test passed.")
+
+    @classmethod
+    def tearDownClass(cls):
         print("Closing the browser...")
-        self.driver.quit()
+        cls.driver.quit()
 
-if __name__ == "__main__":
+
+if _name_ == "_main_":
     unittest.main()
