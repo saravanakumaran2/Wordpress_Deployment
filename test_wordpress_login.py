@@ -87,7 +87,7 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         print("Closing the browser...")
-        cls.driver.quit()
+        self.driver.quit()
 
 
 if __name__ == "__main__":
