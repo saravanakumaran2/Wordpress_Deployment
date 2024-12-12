@@ -86,7 +86,8 @@ pipeline {
                 # Run the Selenium test script within the virtual environment 
                 ssh root@${STAGING_SERVER} " cd ${REPO_PATH} && source myenv/bin/activate && python test_wordpress_login.py " 
                 """ 
-            } 
+                } 
+            }        
         }
     }
 }
