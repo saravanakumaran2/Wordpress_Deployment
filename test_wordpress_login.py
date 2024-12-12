@@ -22,7 +22,7 @@ class TestWordPressLogin(unittest.TestCase):
         # Set up the ChromeDriver service using webdriver-manager
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
-        self.driver.get("http://52.60.108.120:8080/wp-login.php")
+        self.driver.get("http://52.60.108.120:80/wp-login.php")
         self.driver.maximize_window()
 
     def test_login(self):
