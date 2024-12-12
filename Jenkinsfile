@@ -38,8 +38,7 @@ pipeline {
                 -Dsonar.sources=. \
                 -Dsonar.php.version=7.4 \
                 -Dsonar.host.url=http://15.223.157.208:9000 \
-                -Dsonar.login=admin \
-                -Dsonar.password=123
+                -Dsonar.login=sqa_702bcb1dc6881be73b88450c5e501cf3b31b9d1e
             '''
         }
     }
