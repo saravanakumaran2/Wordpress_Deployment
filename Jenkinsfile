@@ -76,5 +76,17 @@ pipeline {
                 }
             }
         }
+
+        stage('Run Selenium Tests') { 
+            steps { 
+                sshagent([STAGING_SERVER_CREDENTIALS]) { 
+                sh """ 
+                # Copy Selenium test script to the server 
+                scp test_wordpress_login.py root@${STAGING_SERVER}:${REPO_PATH} 
+                # Run the Selenium test script within the virtual environment 
+                ssh root@${STAGING_SERVER} " cd ${REPO_PATH} && source myenv/bin/activate && python test_wordpress_login.py " 
+                """ 
+            } 
+        }
     }
 }
