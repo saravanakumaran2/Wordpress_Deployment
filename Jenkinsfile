@@ -8,6 +8,7 @@ pipeline {
         IMAGE_NAME = "saravana227/custom-wordpress:latest"
         IMAGE_NAME_STAGING = "saravana227/custom-wordpress:staging"
         DOCKER_HUB_CREDENTIALS = 'dockerhub-auth' // Add this if it's not already set
+        SONARQUBE_TOKEN = credentials('sonar-token')  // Assuming you've created a Jenkins credential with the SonarQube token
     }
 
     stages {
@@ -23,13 +24,12 @@ pipeline {
             }
         }
 
-        stage('sonarqube') {
+        stage('SonarQube Analysis') {
             steps {
                 script {
                     // This triggers the SonarQube analysis
-                    withSonarQubeEnv(sonar-token) {
+                    withSonarQubeEnv('sonarqube') {  // 'sonarqube' should match the name of your SonarQube server configuration
                         sh '''
-                        # Run the SonarQube Scanner for PHP/WordPress project
                         sonar-scanner \
                             -Dsonar.projectKey=Project \
                             -Dsonar.projectName="Custom WordPress Project" \
