@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+import time
 
 class TestWordPressSetup(unittest.TestCase):
 
@@ -21,18 +22,29 @@ class TestWordPressSetup(unittest.TestCase):
         # Set up ChromeDriver using webdriver-manager
         service = Service(ChromeDriverManager().install())
         cls.driver = webdriver.Chrome(service=service, options=chrome_options)
-        cls.driver.get("http://52.60.108.120/wp-admin/install.php")
         cls.driver.maximize_window()
 
     def test_language_selection_and_site_setup_and_login(self):
         driver = self.driver
         print("Testing language selection, site setup, and login process...")
 
-        # Step 1: Select Language and Click Continue
+        # Step 1: Retry loading the install page until successful
+        retries = 5
+        for i in range(retries):
+            try:
+                driver.get("http://52.60.108.120/wp-admin/install.php")
+                WebDriverWait(driver, 20).until(
+                    EC.visibility_of_element_located((By.ID, "language"))
+                )
+                break
+            except Exception as e:
+                print(f"Attempt {i+1} failed: {e}")
+                time.sleep(20)  # Wait for 20 seconds before retrying
+        else:
+            self.fail("Failed to load the install page after several attempts!")
+
+        # Step 2: Select Language and Click Continue
         try:
-            WebDriverWait(driver, 20).until(
-                EC.visibility_of_element_located((By.ID, "language"))
-            )
             language_dropdown = driver.find_element(By.ID, "language")
             language_option = language_dropdown.find_element(By.XPATH, "//option[@value='en_US' and @data-installed='1']")
             print(f"Found language option: {language_option.text}")
@@ -44,7 +56,7 @@ class TestWordPressSetup(unittest.TestCase):
             print(driver.page_source)  # Print the page source for debugging
             self.fail("Language selection page not found!")
 
-        # Step 2: Fill the Site Setup Form
+        # Step 3: Fill the Site Setup Form
         try:
             WebDriverWait(driver, 20).until(
                 EC.visibility_of_element_located((By.ID, "weblog_title"))
@@ -73,7 +85,7 @@ class TestWordPressSetup(unittest.TestCase):
             print(driver.page_source)  # Print the page source for debugging
             self.fail("Site setup page not found!")
 
-        # Step 3: Verify Success Page and Click Login
+        # Step 4: Verify Success Page and Click Login
         try:
             WebDriverWait(driver, 20).until(
                 EC.presence_of_element_located((By.LINK_TEXT, "Log In"))
@@ -85,7 +97,7 @@ class TestWordPressSetup(unittest.TestCase):
             print(driver.page_source)  # Print the page source for debugging
             self.fail("Installation success page not found!")
 
-        # Step 4: Fill Login Form
+        # Step 5: Fill Login Form
         try:
             WebDriverWait(driver, 20).until(
                 EC.presence_of_element_located((By.ID, "user_login"))
