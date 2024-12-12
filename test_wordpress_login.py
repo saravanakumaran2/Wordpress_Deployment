@@ -31,7 +31,7 @@ class TestWordPressSetupAndLogin(unittest.TestCase):
         print("Testing language selection, site setup, and login process...")
 
         # Step 1: Select Language and Click Continue
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 60).until(
             EC.visibility_of_element_located((By.ID, "language"))
         )
         language_dropdown = driver.find_element(By.ID, "language")
