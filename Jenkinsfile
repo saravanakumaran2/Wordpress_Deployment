@@ -33,7 +33,7 @@ pipeline {
                         sh '''
                         ${SONAR_SCANNER_PATH} \
                             -Dsonar.projectKey=Project \
-                            -Dsonar.projectName="Custom WordPress Project" \
+                            -Dsonar.projectName="Project" \
                             -Dsonar.projectVersion=1.0.0 \
                             -Dsonar.sources=. \
                             -Dsonar.php.version=7.4 \
