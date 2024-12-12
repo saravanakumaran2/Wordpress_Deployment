@@ -32,7 +32,7 @@ pipeline {
             sh '''
             export PATH=$PATH:/opt/sonar-scanner/bin
             sonar-scanner -X \
-            sonar-scanner -Dsonar.projectKey=Project \
+            -Dsonar.projectKey=Project \
               -Dsonar.projectName="Project" \
                -Dsonar.projectVersion=1.0.0 \
              -Dsonar.sources=. \
